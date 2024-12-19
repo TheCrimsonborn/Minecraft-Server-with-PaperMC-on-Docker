@@ -29,8 +29,8 @@ This project sets up a lightweight, scalable Minecraft server using PaperMC and 
 ### Step 1: Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd <repository-folder>
+git clone https://github.com/TheCrimsonborn/Minecraft-Server-with-PaperMC-on-Docker.git 
+cd Minecraft-Server-with-PaperMC-on-Docker
 ```
 
 ### Step 2: Build and Start the Container
