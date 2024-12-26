@@ -1,100 +1,114 @@
+
 # Minecraft Server with PaperMC on Docker
 
-This project sets up a lightweight, scalable Minecraft server using PaperMC and Docker. It uses an Alpine Linux base image and automates server configuration for a smooth experience.
+This project sets up a lightweight, scalable Minecraft server using PaperMC and Docker. It leverages modern containerization practices for a seamless and portable server experience.
 
 ## Features
 
-- **Lightweight:** Based on Alpine Linux for minimal image size.
-- **PaperMC:** High-performance Minecraft server software.
-- **Dockerized:** Easy setup and deployment with Docker.
-- **Volume Support:** Persistent data storage with Docker volumes.
-- **Automatic EULA Acceptance:** Ensures compliance with Minecraft's terms of service.
+- **Lightweight:** Based on Alpine Linux for minimal image size and resource usage.
+- **PaperMC:** High-performance and customizable Minecraft server software.
+- **Dockerized Deployment:** Simplifies setup with Docker and Docker Compose.
+- **Persistent Data:** Ensures world data and configurations are safely stored.
+- **Automatic Restarts:** Configured to automatically restart unless stopped manually.
+- **Customizable Configurations:** Easily adjust server settings such as memory allocation, ports, and versioning.
 
 ## Prerequisites
 
-- [Docker](https://www.docker.com/) installed on your system.
-- Basic knowledge of Docker CLI or a compatible GUI tool.
+- [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) installed.
+- Basic familiarity with command-line operations.
 
-## File Structure
+## File Overview
 
 ```plaintext
 .
-├── Dockerfile           # Defines the Minecraft server image
-├── docker-compose.yml   # Simplifies multi-container Docker application setup
+├── Dockerfile           # Defines the custom image for the Minecraft server
+├── docker-compose.yml   # Orchestrates container deployment
 ```
 
-## Quick Start
+### Dockerfile Highlights
+
+```dockerfile
+# Use Eclipse Temurin's Alpine-based JRE image
+FROM eclipse-temurin:21-jre-alpine
+
+# Set environment variables
+ENV MINECRAFT_VERSION=1.21.3 \
+    PAPER_BUILD=82
+
+# Create a directory for the server
+WORKDIR /minecraft-server/data
+
+# Download the Paper server jar dynamically
+RUN apk add --no-cache curl bash && \
+    curl -o paperclip.jar "https://api.papermc.io/v2/projects/paper/versions/${MINECRAFT_VERSION}/builds/${PAPER_BUILD}/downloads/paper-${MINECRAFT_VERSION}-${PAPER_BUILD}.jar"
+
+# Automatically accept EULA
+RUN echo "eula=true" > eula.txt
+
+# Expose the default Minecraft server port
+EXPOSE 25565
+
+# Start the server with optimized flags
+CMD ["java", "-Xms12288M", "-Xmx12288M", "--add-modules=jdk.incubator.vector", "-XX:+UseG1GC", "-XX:+ParallelRefProcEnabled", "-XX:MaxGCPauseMillis=200", "-XX:+UnlockExperimentalVMOptions", "-XX:+DisableExplicitGC", "-XX:+AlwaysPreTouch", "-jar", "paperclip.jar"]
+```
+
+### docker-compose.yml Highlights
+
+```yaml
+services:
+  minecraft:
+    build: .
+    container_name: minecraft
+    ports:
+      - "25565:25565"
+    volumes:
+      - minecraft:/minecraft-server/data
+    restart: unless-stopped
+
+volumes:
+  minecraft:
+
+```
+
+## Getting Started
 
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/TheCrimsonborn/Minecraft-Server-with-PaperMC-on-Docker.git 
+git clone <repository-url>
 cd Minecraft-Server-with-PaperMC-on-Docker
 ```
 
-### Step 2: Build and Start the Container
+### Step 2: Build and Deploy
 
-Using Docker Compose:
+Build the Docker image and start the server using Docker Compose:
 
 ```bash
 docker-compose up -d
 ```
 
-This will:
-- Build the Docker image using the provided `Dockerfile`.
-- Start a container exposing the default Minecraft server port (`25565`).
+### Step 3: Verify and Connect
 
-### Step 3: Verify the Server
+- Check logs: `docker logs minecraft`
+- Connect via Minecraft: `<your-ip>:25565`
 
-Check the container logs to ensure the server is running:
+## Customization Options
 
-```bash
-docker logs <container-name>
-```
+### Memory Allocation
 
-Replace `<container-name>` with the name of your Minecraft server container (e.g., `minecraft_minecraft_1`).
+Modify the `-Xmx` and `-Xms` flags in the `Dockerfile` to allocate desired memory.
 
-### Step 4: Connect to the Server
+### Version Control
 
-Open Minecraft and connect to the server using the host's IP address and the default port:
-
-```
-<host-ip>:25565
-```
-
-## Customization
-
-### Environment Variables
-
-You can modify the Minecraft version and PaperMC build in the `Dockerfile`:
-
-```dockerfile
-ENV MINECRAFT_VERSION=1.20.1 \
-    PAPER_BUILD=latest
-```
-
-### Resource Allocation
-
-Adjust the memory limits in the `CMD` instruction of the `Dockerfile`:
-
-```dockerfile
-CMD ["java", "-Xmx1024M", "-Xms1024M", "-jar", "paperclip.jar", "--nogui"]
-```
+Update `MINECRAFT_VERSION` and `PAPER_BUILD` in the Dockerfile to use specific versions.
 
 ### Persistent Storage
 
-The `docker-compose.yml` mounts a volume for server data:
+The server's data is stored in the `minecraft` volume defined in `docker-compose.yml`.
 
-```yaml
-volumes:
-  - ./data:/minecraft-server
-```
+### Networking
 
-The `./data` directory will store server data (world files, configuration, etc.).
-
-### Ports
-
-The server exposes the default Minecraft port (`25565`). Update the `docker-compose.yml` to use a custom port if needed:
+Customize the ports in `docker-compose.yml`:
 
 ```yaml
 ports:
@@ -103,24 +117,21 @@ ports:
 
 ## Troubleshooting
 
-- **Container doesn't start:** Check the logs for errors using `docker logs <container-name>`.
-- **Unable to connect to server:** Ensure the correct IP and port are used, and confirm your firewall allows traffic on port `25565`.
-- **Volume issues:** Make sure the `./data` directory is writable.
+- **Connection Issues:** Ensure ports are open and the correct IP is used.
+- **Volume Problems:** Verify write permissions for the volume mount directory.
 
 ## Stopping the Server
 
-To stop the server gracefully:
+Gracefully stop the server and containers:
 
 ```bash
 docker-compose down
 ```
 
-This will stop the container but keep the persistent data in the `./data` directory.
+## Contributing
+
+Contributions are welcome! Feel free to open issues or submit pull requests.
 
 ## License
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.
-
----
-
-Enjoy your Minecraft server! If you encounter issues or have suggestions, feel free to open an issue or contribute to the project.
