@@ -1,8 +1,9 @@
 services:
   minecraft:
     build: .
+    container_name: minecraft
     ports:
       - "25565:25565"
     volumes:
-      - ./data:/minecraft-server
+      - ./data:/minecraft-server/data
     restart: unless-stopped
