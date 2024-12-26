@@ -6,7 +6,7 @@ ENV MINECRAFT_VERSION=1.21.3 \
     PAPER_BUILD=82
 
 # Create a directory for the server
-WORKDIR /minecraft-server
+WORKDIR /minecraft-server/data
 
 # Download the Paper server jar dynamically
 RUN apk add --no-cache curl bash && \
