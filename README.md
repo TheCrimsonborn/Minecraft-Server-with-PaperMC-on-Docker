@@ -21,7 +21,6 @@ This project sets up a lightweight, scalable Minecraft server using PaperMC and 
 .
 ├── Dockerfile           # Defines the Minecraft server image
 ├── docker-compose.yml   # Simplifies multi-container Docker application setup
-├── data/                # Directory for persistent server data (created on runtime)
 ```
 
 ## Quick Start
