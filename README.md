@@ -75,7 +75,7 @@ volumes:
 ### Step 1: Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/TheCrimsonborn/Minecraft-Server-with-PaperMC-on-Docker/tree/main
 cd Minecraft-Server-with-PaperMC-on-Docker
 ```
 
