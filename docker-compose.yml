@@ -4,9 +4,35 @@ services:
     container_name: minecraft
     ports:
       - "25565:25565"
+      - "9940:9940"
     volumes:
       - minecraft:/minecraft-server/data
+      - minecraft-plugins:/minecraft-server/data/plugins
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    depends_on:
+      - minecraft
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
     restart: unless-stopped
 
 volumes:
   minecraft:
+  minecraft-plugins:
+  grafana-data:
